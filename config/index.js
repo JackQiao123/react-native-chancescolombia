@@ -23,7 +23,7 @@ const config = {
 
   SETTINGS: {
     ENCRYPT: true,
-    REFRESH_INTERVAL: 30000,
+    REFRESH_INTERVAL: 90000,
     APP_NAME: 'app_chancescolombia'
   },
 

@@ -44,18 +44,17 @@ class App extends Component {
           detail.id = game.id;
           game.data = detail;
           game.date = detail.date;
-          game.datetime = detail.datetime;
         });
       }
+      
+      await this.props.setIni(ini);
+      await this.setState({ initialized: true });
     }
     if (ini === null) {
       this.alertWithType('error', I18n.t('error'), I18n.t('there_is_no_internet_connection'));
       setTimeout(() => {
         ExitApp.exitApp();
       }, 2000);
-    } else {
-      await this.props.setIni(ini);
-      await this.setState({ initialized: true });
     }
   }
 
@@ -81,9 +80,26 @@ class App extends Component {
     }
   }
 
+  async handleRefresh() {
+    const ini = await Api.getIni();
+    if (ini.companies.length > 0) {
+      const games = ini.companies[0].games;
+      for (let i = 0; i < games.length; i++) {
+        const game = games[i];
+        await this.getGameDetail(game).then((detail) => {
+          detail.updated_at = game.updated_at;
+          detail.id = game.id;
+          game.data = detail;
+          game.date = detail.date;
+        });
+      }
+      await this.props.setIni(ini);
+    }
+  }
+
   render() {
     const renderContent = this.state.initialized ? (
-      <MainScreen />
+      <MainScreen handleRefresh={this.handleRefresh.bind(this)} />
     ) : (
       <View style={Styles.container}>
         <Image style={Styles.background} source={Images.splash} resizeMode="cover" />

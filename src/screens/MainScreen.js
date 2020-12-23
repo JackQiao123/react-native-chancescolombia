@@ -28,12 +28,12 @@ class MainScreen extends Component {
 
   constructor(props) {
     super(props);
-    this.ini = this.props.global.ini;
+    this.ini = props.global.ini;
     this.state = {
+      menuData: AppHelper.getMenuNode(this.ini),
       menuItem: null,
       loadingRefreshIni: false
     };
-    this.menuData = AppHelper.getMenuNode(this.ini);
     this.unmounted = false;
     this.timerRefreshIni = null;
     this.currentScreen = null;
@@ -63,10 +63,23 @@ class MainScreen extends Component {
     this.unmounted = true;
   }
 
+  UNSAFE_componentWillReceiveProps(props) {
+    const ini = props.global.ini;
+    if (JSON.stringify(this.ini.companies[0].games) !== JSON.stringify(ini.companies[0].games)) {
+      const data = AppHelper.getMenuNode(ini);
+      data.map(item => item.depth = 1);
+      this.setState({
+        menuData: data,
+        menuItem: data
+      });
+    }
+  }
+
   onDrawerItemSelected(node, info, origin) {
     if (origin === 0 && !node.collapsable) {
       this.closeDrawer();
     }
+
     this.setState({
       menuItem: node
     });
@@ -220,6 +233,8 @@ class MainScreen extends Component {
 
   renderScreen() {
     const { menuItem } = this.state;
+
+    const { handleRefresh } = this.props;
     if (menuItem === null) {
       return CommonWidget.renderActivityIndicator();
     }
@@ -232,6 +247,7 @@ class MainScreen extends Component {
             menu={menuItem}
             onMenuBackPress={this.onHomePress.bind(this)}
             onMenuPress={this.onMenuPress.bind(this)}
+            handleRefresh={handleRefresh}
           />
         );
       case SCREEN_TYPE.GAME:
@@ -260,10 +276,11 @@ class MainScreen extends Component {
     const Banner = firebase.admob.Banner;
     const AdRequest = firebase.admob.AdRequest;
     const request = new AdRequest();
+    const { menuData } = this.state;
 
     const drawerContent = (
       <TreeView
-        data={this.menuData}
+        data={menuData}
         ref={(ref) => { this.drawerContent = ref; }}
         renderContent={this.renderDrawerItem.bind(this)}
         onSelected={this.onDrawerItemSelected.bind(this)}

@@ -9,11 +9,21 @@ import ScoreCard from '../components/custom/ScoreCard';
 class HomeScreen extends Component {
   constructor(props) {
     super(props);
-    const { menu } = this.props;
     this.state = {
       loading: false,
-      menuList: menu && menu.childNodes ? this._configMenuList([], menu.childNodes) : []
+      menuList: []
     };
+  }
+
+  componentDidMount() {
+    this.UNSAFE_componentWillReceiveProps(this.props);
+  }
+
+  UNSAFE_componentWillReceiveProps(props) {
+    const { menu } = props;
+    this.setState({
+      menuList: menu && menu.childNodes ? this._configMenuList([], menu.childNodes) : []
+    });
   }
 
   _configMenuList(list, nodes) {
@@ -33,13 +43,12 @@ class HomeScreen extends Component {
     return `${index}`;
   }
 
-  refresh() {
+  async refresh() {
     this.setState({
       loading: true
     });
-    const { menu } = this.props;
+    await this.props.handleRefresh();
     this.setState({
-      menuList: menu && menu.childNodes ? this._configMenuList([], menu.childNodes) : [],
       loading: false
     });
   }
@@ -70,7 +79,7 @@ class HomeScreen extends Component {
       >
         <View>
           {
-            !loading && menuList.length > 0 && (
+            menuList.length > 0 && (
               <FlatList
                 data={menuList}
                 keyExtractor={this._keyExtractor.bind(this)}
@@ -81,7 +90,7 @@ class HomeScreen extends Component {
         </View>
         <View style={Styles.sectionContainer}>
           {
-            !loading && menu.childNodes[0]['description'] ? (
+            menu.childNodes[0]['description'] ? (
               <View style={Styles.section}>
                 {CommonWidget.renderHtml(menu.childNodes[0]['description'])}
               </View>
@@ -92,5 +101,9 @@ class HomeScreen extends Component {
     );
   }
 }
+
+HomeScreen.defaultProps = {
+  handleRefresh: () => {}
+};
 
 export default HomeScreen;
