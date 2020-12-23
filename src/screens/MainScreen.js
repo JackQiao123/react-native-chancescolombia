@@ -28,9 +28,9 @@ class MainScreen extends Component {
 
   constructor(props) {
     super(props);
-    this.ini = props.global.ini;
     this.state = {
-      menuData: AppHelper.getMenuNode(this.ini),
+      ini: props.global.ini,
+      menuData: AppHelper.getMenuNode(props.global.ini),
       menuItem: null,
       loadingRefreshIni: false
     };
@@ -63,16 +63,31 @@ class MainScreen extends Component {
     this.unmounted = true;
   }
 
-  UNSAFE_componentWillReceiveProps(props) {
-    const ini = props.global.ini;
-    if (JSON.stringify(this.ini) !== JSON.stringify(ini)) {
-      const data = AppHelper.getMenuNode(ini);
-      data.map(item => item.depth = 1);
+  async UNSAFE_componentWillReceiveProps(props) {
+    const { ini } = this.state;
+    if (JSON.stringify(ini) !== JSON.stringify(props.global.ini) && this.props.global.rewardedCount === props.global.rewardedCount) {
+      const data = AppHelper.getMenuNode(props.global.ini);
       this.setState({
-        menuData: data,
-        menuItem: data
+        ini: props.global.ini,
+        menuData: this._configNode(data, null),
+        menuItem: this._configNode(data, null)
       });
     }
+  }
+
+  _configNode(node, parentNode) {
+    const retNode = { ...node, parentNode };
+    retNode.depth = parentNode ? (parentNode.depth + 1) : 0;
+    if (node.childNodes) {
+      retNode.childNodes = [];
+      const { childNodes } = node;
+      for (let i = 0, ni = childNodes.length; i < ni; i++) {
+        const childNode = childNodes[i];
+        const retChildNode = this._configNode(childNode, retNode);
+        retNode.childNodes.push(retChildNode);
+      }
+    }
+    return retNode;
   }
 
   onDrawerItemSelected(node, info, origin) {
@@ -100,7 +115,12 @@ class MainScreen extends Component {
   }
 
   onHomePress() {
-    this.drawerContent.selectNode(this.drawerContent.getRootNode());
+    const data = AppHelper.getMenuNode(this.state.ini);
+    this.setState({
+      menuData: this._configNode(data, null),
+      menuItem: this._configNode(data, null),
+    })
+    // this.drawerContent.selectNode(this.drawerContent.getRootNode());
   }
 
 

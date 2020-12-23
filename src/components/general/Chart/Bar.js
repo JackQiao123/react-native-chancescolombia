@@ -47,7 +47,7 @@ export default class Bar extends Component {
           <BarChart
             style = {{flex: 1}}
             data = {data}
-            svg = {{fill: '#2980B9'}}
+            svg = {{fill: '#2D2D2D'}}
             contentInset = {{top: 10, bottom: 10}}
           >
             <Grid />
