@@ -65,7 +65,7 @@ class MainScreen extends Component {
 
   UNSAFE_componentWillReceiveProps(props) {
     const ini = props.global.ini;
-    if (JSON.stringify(this.ini.companies[0].games) !== JSON.stringify(ini.companies[0].games)) {
+    if (JSON.stringify(this.ini) !== JSON.stringify(ini)) {
       const data = AppHelper.getMenuNode(ini);
       data.map(item => item.depth = 1);
       this.setState({
