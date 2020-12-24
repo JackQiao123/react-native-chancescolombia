@@ -18,7 +18,7 @@ export default class Bar extends Component {
       var i = 0;
       for (var key in this.props.data) {
         if (i % 8 == 0) {
-          xAxes.push(this.props.data[key][0].name);
+          xAxes.push(i);
         }
 
         if (max < this.props.data[key][0].v) {
