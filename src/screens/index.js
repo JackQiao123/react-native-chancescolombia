@@ -34,19 +34,27 @@ class App extends Component {
     NetInfo.addEventListener(state => this.handleConnectionChange.bind(this));
     await Api.getConfig();
     const ini = await Api.getIni();
-
     if (ini.companies.length > 0) {
       const games = ini.companies[0].games;
-      for (let i = 0; i < games.length; i++) {
-        const game = games[i];
-        await this.getGameDetail(game).then((detail) => {
-          detail.updated_at = game.updated_at;
-          detail.id = game.id;
-          game.data = detail;
-          game.date = detail.date;
-        });
-      }
-      
+      const promises = games.map(game => {
+        const params = {
+          game_id: game.id,
+          multiple: 0
+        };
+        return new Promise(resolve => {
+          Api.getGameResult(params).then(detail => {
+            detail.updated_at = game.updated_at;
+            detail.id = game.id;
+            game.data = detail;
+            game.date = detail.date;
+            resolve();
+          }).catch(e => {
+            console.log(e);
+            resolve();
+          });
+        })
+      });
+      await Promise.all(promises).catch(e => {console.log(e)});
       await this.props.setIni(ini);
       await this.setState({ initialized: true });
     }
@@ -56,15 +64,6 @@ class App extends Component {
         ExitApp.exitApp();
       }, 2000);
     }
-  }
-
-  async getGameDetail(game) {
-    const params = {
-      game_id: game.id,
-      multiple: 0
-    };
-    const detail = await Api.getGameResult(params);
-    return detail;
   }
 
   alertWithType(type, title, message) {
@@ -84,15 +83,25 @@ class App extends Component {
     const ini = await Api.getIni();
     if (ini.companies.length > 0) {
       const games = ini.companies[0].games;
-      for (let i = 0; i < games.length; i++) {
-        const game = games[i];
-        await this.getGameDetail(game).then((detail) => {
-          detail.updated_at = game.updated_at;
-          detail.id = game.id;
-          game.data = detail;
-          game.date = detail.date;
-        });
-      }
+      const promises = games.map(game => {
+        const params = {
+          game_id: game.id,
+          multiple: 0
+        };
+        return new Promise(resolve => {
+          Api.getGameResult(params).then(detail => {
+            detail.updated_at = game.updated_at;
+            detail.id = game.id;
+            game.data = detail;
+            game.date = detail.date;
+            resolve();
+          }).catch(e => {
+            console.log(e);
+            resolve();
+          });
+        })
+      });
+      await Promise.all(promises);
       await this.props.setIni(ini);
     }
   }
