@@ -115,12 +115,12 @@ class MainScreen extends Component {
   }
 
   onHomePress() {
+    this.drawerContent.selectNode(this.drawerContent.getRootNode());
     const data = AppHelper.getMenuNode(this.state.ini);
     this.setState({
       menuData: this._configNode(data, null),
       menuItem: this._configNode(data, null),
     })
-    // this.drawerContent.selectNode(this.drawerContent.getRootNode());
   }
 
 
