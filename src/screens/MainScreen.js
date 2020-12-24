@@ -32,7 +32,8 @@ class MainScreen extends Component {
       ini: props.global.ini,
       menuData: AppHelper.getMenuNode(props.global.ini),
       menuItem: null,
-      loadingRefreshIni: false
+      loadingRefreshIni: false,
+      initialLoad: true
     };
     this.unmounted = false;
     this.timerRefreshIni = null;
@@ -148,6 +149,12 @@ class MainScreen extends Component {
   }
 
   async handleTimerRefreshIni() {
+    if (this.state.initialLoad) {
+      this.setState({
+        initialLoad: false
+      });
+      return;
+    }
     if (this.state.loadingRefreshIni) {
       return;
     }
