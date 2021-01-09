@@ -106,17 +106,21 @@ class MainScreen extends Component {
   }
 
   onMenuPress(node) {
-    this.drawerContent.selectNode(node, { trigger: true, toggle: false });
+    if (this.drawerContent) {
+      this.drawerContent.selectNode(node, { trigger: true, toggle: false });
+    }
   }
 
   onMenuBackPress(node) {
-    if (node.parentNode) {
+    if (this.drawerContent && node.parentNode) {
       this.drawerContent.selectNode(node.parentNode, { trigger: true, toggle: false });
     }
   }
 
   onHomePress() {
-    this.drawerContent.selectNode(this.drawerContent.getRootNode());
+    if (this.drawerContent) {
+      this.drawerContent.selectNode(this.drawerContent.getRootNode());
+    }
     const data = AppHelper.getMenuNode(this.state.ini);
     this.setState({
       menuData: this._configNode(data, null),
@@ -188,7 +192,10 @@ class MainScreen extends Component {
 
   initialize() {
     const { INITIAL_MENU } = CONFIG.VIEW_OPTIONS;
-    this.drawerContent.selectNodeById(INITIAL_MENU.ID, INITIAL_MENU.OPTIONS);
+
+    if (this.drawerContent) {
+      this.drawerContent.selectNodeById(INITIAL_MENU.ID, INITIAL_MENU.OPTIONS);
+    }
   }
 
   closeDrawer() {
