@@ -52,12 +52,12 @@ class ScoreCard extends Component {
   render() {
     const { type, mode, data } = this.props;
 
-    const isRecentlyUpdated = AppHelper.isRecentlyUpdated(data.datetime);
+    const isRecentlyUpdated = AppHelper.isRecentlyUpdated(data.date);
 
     let d = new Date();
     let utc = d.getTime();
     let date = new Date(utc - (3600000 * 4));
-    let today = moment(date).format('DD-MM-YYYY');
+    let today = moment(date).format('YYYY-MM-DD');
 
     let scoreView = null;
     if (data.score) {

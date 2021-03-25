@@ -169,7 +169,7 @@ const AppHelper = {
 
   isRecentlyUpdated(updated_at) {
     const todayDate = new Date();
-    return updated_at.indexOf(moment(todayDate).format('DD-MM-YYYY')) === 0;
+    return updated_at.indexOf(moment(todayDate).format('YYYY-MM-DD')) === 0;
   },
 
   buildHttpQuery: (params) => {
