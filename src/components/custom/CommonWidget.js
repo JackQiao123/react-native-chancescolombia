@@ -63,6 +63,9 @@ const CommonWidget = {
   },
 
   renderStandardNumbers(numbers, index, recentlyUpdated = false) {
+    if (numbers.length === 1) {
+      numbers = numbers[0];
+    }
     return (
       <View key={index} style={Styles.standardNumbers}>
         {numbers.map((number, subindex) => (
@@ -97,6 +100,9 @@ const CommonWidget = {
   },
 
   renderCircleNumbers(numbers, index, recentlyUpdated = false) {
+    if (numbers.length === 1) {
+      numbers = numbers[0];
+    }
     return (
       <View key={index} style={Styles.circleNumbers}>
         {numbers.map((number, subindex) => (
@@ -107,6 +113,7 @@ const CommonWidget = {
   },
 
   renderCircleNumber(number, index, recentlyUpdated = false) {
+
     const str = number;
     const res = str.replace('+', '').replace('=', '').replace('!', '').replace('?', '');
     
@@ -151,6 +158,9 @@ const CommonWidget = {
   },
 
   renderTodayNumbers(numbers, index, recentlyUpdated = false) {
+    if (numbers.length === 1) {
+      numbers = numbers[0];
+    }
     return (
       <View key={index} style={Styles.circleNumbers}>
         {numbers.map((number, subindex) => (

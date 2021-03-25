@@ -105,7 +105,7 @@ class MenuItem extends Component {
 
     let renderRecentlyUpdated = null;
     if (menu && (menu.menuType === MENU_TYPE.COMPANY || menu.menuType === MENU_TYPE.GAME)) {
-      renderRecentlyUpdated = AppHelper.isRecentlyUpdated(menu.data.updated_at) ? (
+      renderRecentlyUpdated = AppHelper.isRecentlyUpdated(menu.data.datetime) ? (
         <Animated.View style={[styles.menuItemDescriptionIcon, { backgroundColor: caretColor }]} />
       ) : null;
     }

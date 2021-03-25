@@ -33,12 +33,12 @@ const AppHelper = {
     const { SCREEN_TYPE, MENU_TYPE } = CONFIG.ENUMS;
     return {
       id: `${prefix}_game_${game.id}`,
-      icon: game.logo ? { uri: game.logo } : null,
+      icon: game.logoUrl ? { uri: game.logoUrl } : null,
       text: game.title,
-      description: game.description,
+      description: '',
       screenType: SCREEN_TYPE.GAME,
       menuType: MENU_TYPE.GAME,
-      updated_at: game.updated_at,
+      updated_at: game.data.datetime,
       date: game.date,
       data: game.data,
     };
@@ -48,7 +48,7 @@ const AppHelper = {
     const { SCREEN_TYPE, MENU_TYPE } = CONFIG.ENUMS;
     const node = {
       id: 'date_' + date,
-      text: moment(new Date()).format('DD-MM-YYYY') == date ? I18n.t('result') + ' ' + I18n.t('today') + ' ' + moment(new Date()).format('DD MMM YYYY') : moment(date, 'DD-MM-YYYY').format('DD MMM YYYY'),
+      text: moment(new Date()).format('YYYY-MM-DD') == date ? I18n.t('result') + ' ' + I18n.t('today') + ' ' + moment(new Date()).format('DD MMM YYYY') : moment(date, 'YYYY-MM-DD').format('DD MMM YYYY'),
       menuType: MENU_TYPE.PRIMARY,
       screenType: SCREEN_TYPE.MENU,
       collapsable: true,
@@ -56,13 +56,9 @@ const AppHelper = {
       description,
       childNodes: []
     };
-    
-    // games.sort(function(a, b) {
-    //   return a.title.localeCompare(b.title, 'es', {sensitivity: 'base'});
-    // });
 
     games.sort((a, b) => {
-      if (a.datetime > b.datetime) {
+      if (a.data.datetime > b.data.datetime) {
         return -1;
       }
       return 1;
@@ -72,13 +68,13 @@ const AppHelper = {
       const childNode = AppHelper._getGameMenuNode(game, 'company');
       node.childNodes.push(childNode);
     });
-
     return node;
   },
 
   getMenuNode: (data) => {
     const { SCREEN_TYPE, MENU_TYPE } = CONFIG.ENUMS;
-    const { companies, description } = data;
+    const { games, sessions } = data;
+
     const node = {
       id: 'home',
       text: I18n.t(CONFIG.SETTINGS.APP_NAME),
@@ -87,13 +83,11 @@ const AppHelper = {
       childNodes: []
     };
 
-    const { games } = companies[0];
-
     let dates = [];
-
-    games.forEach((game) => {
-      if (dates.indexOf(game.date) === -1) {
-        dates.push(game.date);
+    const keys = Object.keys(sessions);
+    keys.forEach((key) => {
+      if (dates.indexOf(key) === -1) {
+        dates.push(key);
       }
     });
 
@@ -103,11 +97,21 @@ const AppHelper = {
       }
       return 1;
     });
+
     for (let i = 0; i < dates.length; i++) {
       const date = dates[i];
-      const companiesNode = AppHelper._getCompaniesMenuNode(games.filter(game => game.date === date), date, description);
-
-      node.childNodes.push(companiesNode);  
+      let data = [];
+      sessions[date].forEach((session) => {
+        session.score = session.score;
+        session.date = date;
+        session.id = session.game_id;
+        let game = games[session.game_id];
+        game.data = session;
+        game.date = date;
+        data.push(game);
+      });
+      const companiesNode = AppHelper._getCompaniesMenuNode(data, date, '');
+      node.childNodes.push(companiesNode);
     }
 
     return node;

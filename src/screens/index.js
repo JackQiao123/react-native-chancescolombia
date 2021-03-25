@@ -31,33 +31,13 @@ class App extends Component {
   }
 
   async initialize() {
+    const { date } = this.props.global;
     NetInfo.addEventListener(state => this.handleConnectionChange.bind(this));
     await Api.getConfig();
-    const ini = await Api.getIni();
-    if (ini.companies.length > 0) {
-      const games = ini.companies[0].games;
-      const promises = games.map(game => {
-        const params = {
-          game_id: game.id,
-          multiple: 0
-        };
-        return new Promise(resolve => {
-          Api.getGameResult(params).then(detail => {
-            detail.updated_at = game.updated_at;
-            detail.id = game.id;
-            game.data = detail;
-            game.date = detail.date;
-            resolve();
-          }).catch(e => {
-            console.log(e);
-            resolve();
-          });
-        })
-      });
-      await Promise.all(promises).catch(e => {console.log(e)});
-      await this.props.setIni(ini);
-      await this.setState({ initialized: true });
-    }
+    const ini = await Api.getResultData(date);
+    await this.props.setIni(ini);
+    await this.setState({ initialized: true });
+
     if (ini === null) {
       this.alertWithType('error', I18n.t('error'), I18n.t('there_is_no_internet_connection'));
       setTimeout(() => {
@@ -79,31 +59,14 @@ class App extends Component {
     }
   }
 
-  async handleRefresh() {
-    const ini = await Api.getIni();
-    if (ini.companies.length > 0) {
-      const games = ini.companies[0].games;
-      const promises = games.map(game => {
-        const params = {
-          game_id: game.id,
-          multiple: 0
-        };
-        return new Promise(resolve => {
-          Api.getGameResult(params).then(detail => {
-            detail.updated_at = game.updated_at;
-            detail.id = game.id;
-            game.data = detail;
-            game.date = detail.date;
-            resolve();
-          }).catch(e => {
-            console.log(e);
-            resolve();
-          });
-        })
-      });
-      await Promise.all(promises);
-      await this.props.setIni(ini);
+  async handleRefresh(date) {
+    if (!date) {
+      date = this.props.global.date;
+    } else if (date === 'reset') {
+      date = '';
     }
+    const ini = await Api.getResultData(date);
+    await this.props.setIni(ini);
   }
 
   render() {

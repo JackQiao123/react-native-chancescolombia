@@ -81,8 +81,24 @@ const Api = {
     }
   },
 
-  async getIni() {
-    const url = `${API_ENDPOINTS.APP}/companies`;
+  async getResultData(date) {
+    const url = `${API_ENDPOINTS.APP}/live${date ? '?date=' + date : ''}`;
+    const params = Api.addEncryptParams(params);
+    try {
+      const res = await RestApi.get(url, params);
+      if (res.status === 200) {
+        const data = await res.json();
+        return data;
+      }
+      return null;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  },
+
+  async getIni(date) {
+    const url = `${API_ENDPOINTS.APP}/companies${date ? '?date=' + date : ''}`;
     const params = Api.addEncryptParams(params);
     try {
       const res = await RestApi.get(url, params);

@@ -4,4 +4,5 @@ export default createTypes(`
   INCREASE_REWARDED
   SET_GAME_PARAMS
   SET_INI
+  SET_DATE
 `);

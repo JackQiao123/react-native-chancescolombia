@@ -88,6 +88,7 @@ class MainScreen extends Component {
         retNode.childNodes.push(retChildNode);
       }
     }
+
     return retNode;
   }
 
@@ -247,7 +248,7 @@ class MainScreen extends Component {
         inputRange: [0, 180, 180, 360],
         outputRange: [Colors.caret, Colors.caret, Colors.caretHighlight, Colors.caretHighlight]
       });
-      renderRecentlyUpdated = AppHelper.isRecentlyUpdated(node.data.updated_at) ? (
+      renderRecentlyUpdated = AppHelper.isRecentlyUpdated(node.data.datetime) ? (
         <Animated.View style={[Styles.drawerItemDescriptionIcon, { backgroundColor: caretColor }]} />
       ) : null;
     }

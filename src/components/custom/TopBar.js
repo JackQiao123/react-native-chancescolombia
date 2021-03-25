@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import {
-  Animated, Image, Text, TouchableOpacity, View
+  Animated, Text, TouchableOpacity, View
 } from 'react-native';
+import { connect } from 'react-redux';
+import moment from 'moment';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { setDate } from '../../actions/global';
 
-import AppHelper from '../../helpers/AppHelper';
 import { Colors, Fonts, Metrics } from '../../theme';
-import CONFIG from '../../config';
-
-const { MENU_TYPE } = CONFIG.ENUMS;
 
 const styles = {
   breedCrumb: {
@@ -80,12 +79,12 @@ const styles = {
   }
 };
 
-class BreedCrumb extends Component {
+class TopBar extends Component {
   constructor(props) {
     super(props);
     this.state = {
       show: false,
-      date: new Date()
+      date: props.global.date
     };
   }
 
@@ -106,16 +105,23 @@ class BreedCrumb extends Component {
   onChangeDate(value) {
     let date = new Date(value);
 
-    this.setState({
-      show: false,
-      date
-    });
-
     let yy = date.getFullYear();
     let mm = date.getMonth() + 1;
     let dd = date.getDate();
-    let full = yy + '-' + (mm > 9 ? '' : '0') + mm + '-' + (dd > 9 ? '' : '0') + dd;
+    let full = (dd > 9 ? '' : '0') + dd + '-' + (mm > 9 ? '' : '0') + mm + '-' + yy;
+    this.setState({
+        show: false,
+        date: full
+    });
+    this.props.setDate(full);
     this.props.onCalendarPress(full);
+  }
+
+  hanldeReset() {
+    const { onRefreshPress } = this.props;
+    this.props.setDate('');
+    onRefreshPress('reset');
+    this.setState({ date: '' });
   }
 
   cycleAnimation() {
@@ -130,74 +136,48 @@ class BreedCrumb extends Component {
   }
 
   render() {
-    const { LAYOUTS } = CONFIG.VIEW_OPTIONS;
-    const { menu } = this.props;
-    const { show } = this.state;
-
-    const caretColor = this.animatedValue.interpolate({
-      inputRange: [0, 180, 180, 360],
-      outputRange: [Colors.caret, Colors.caret, Colors.caretHighlight, Colors.caretHighlight]
-    });
-
-    let renderRecentlyUpdated = null;
-    const breedCrumbCompanySame = ((!LAYOUTS.BREED_CRUMB_COMPANY_DISTINCTION) && menu.menuType === MENU_TYPE.COMPANY);
-
-    if (breedCrumbCompanySame || menu.menuType === MENU_TYPE.GAME) {
-      renderRecentlyUpdated = AppHelper.isRecentlyUpdated(menu.data.datetime) ? (
-        <Animated.View style={[styles.breedCrumbDescriptionIcon, { backgroundColor: caretColor }]} />
-      ) : null;
-    }
-
+    const { show, date } = this.state;
     return (
       <View style={styles.breedCrumb}>
-        {
-          menu.parentNode ? (
-            <View style={styles.breedCrumbSide}>
-              <TouchableOpacity style={styles.breedCrumbButtonLeft} onPress={this.props.onPress.bind(this, menu)}>
-                <Icon style={styles.breedCrumbButtonIconLeft} name="angle-left" />
-              </TouchableOpacity>
+        <View style={[styles.breedCrumbMain]}>
+            <View style={styles.breedCrumbContent}>
+                <Text style={styles.breedCrumbTitle}>{date ? moment(date, 'DD-MM-YYYY').format('DD MMM YYYY') : ''}</Text>
             </View>
-          ) : null
-        }
-        {
-          menu ? (
-            <View style={[styles.breedCrumbMain]}>
-              { menu.icon && (breedCrumbCompanySame || menu.menuType === MENU_TYPE.GAME) ? <Image style={styles.breedCrumbImage} source={menu.icon} resizeMode="contain" /> : null }
-              <View style={styles.breedCrumbContent}>
-                <Text style={styles.breedCrumbTitle}>{menu.text}</Text>
-              </View>
-            </View>
-          ) : null
-        }
-        {
-          (menu.menuType === MENU_TYPE.GAME || (menu.menuType === MENU_TYPE.COMPANY && LAYOUTS.SHOW_ALL_GAMES_AT_COMPANY)) ? (
-            <View style={[styles.breedCrumbSide]}>
-              <TouchableOpacity
+        </View>
+        <View style={[styles.breedCrumbSide]}>
+            <TouchableOpacity
                 style={styles.breedCrumbButton}
                 onPress={this.onCalendarPress.bind(this)}
-              >
+            >
                 <Icon style={styles.breedCrumbButtonIcon} name="calendar" />
-              </TouchableOpacity>
-              <DateTimePickerModal
+            </TouchableOpacity>
+            <DateTimePickerModal
                 isVisible={show}
                 mode="date"
                 onConfirm={this.onChangeDate.bind(this)}
                 onCancel={() => this.setState({show: false})}
-              />
-              <TouchableOpacity style={styles.breedCrumbButton} onPress={this.props.onRefreshPress}>
+            />
+            <TouchableOpacity style={styles.breedCrumbButton} onPress={this.hanldeReset.bind(this)}>
                 <Icon style={styles.breedCrumbButtonIcon} name="refresh" />
-              </TouchableOpacity>
-            </View>
-          ) : null
-        }
+            </TouchableOpacity>
+        </View>
       </View>
     );
   }
 }
 
-BreedCrumb.defaultProps = {
-  onPress: () => {},
+TopBar.defaultProps = {
   onCalendarPress: () => {},
   onRefreshPress: () => {}
 };
-export default BreedCrumb;
+
+const mapStateToProps = state => ({
+  global: state.get('global')
+});
+
+const mapDispatchToProps = dispatch => ({
+  dispatch,
+  setDate: date => dispatch(setDate(date))
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(TopBar);

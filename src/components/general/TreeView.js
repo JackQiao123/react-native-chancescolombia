@@ -165,14 +165,20 @@ class TreeView extends Component {
 
   render() {
     const { list } = this.state;
-    list.sort(function(a, b) {
+    let data = [];
+    list.forEach((item) => {
+      if (!data.find(it => it.id === item.id)) {
+        data.push(item);
+      }
+    })
+    data.sort(function(a, b) {
       return a.text.localeCompare(b.text, 'es', {sensitivity: 'base'});
     });
     return (
       <ScrollView style={this.props.containerStyle ? this.props.containerStyle : null}>
         <FlatList
           keyExtractor={this._keyExtractor.bind(this)}
-          data={this.state.list}
+          data={data}
           renderItem={this.renderItem.bind(this)}
         />
       </ScrollView>

@@ -16,6 +16,10 @@ const setIni = (state, action) => ({
   ini: action.ini
 });
 
+const setDate = (state, action) => ({
+  ...state,
+  date: action.date
+});
 
 const increaseRewarded = (state, action) => ({
   ...state,
@@ -23,6 +27,7 @@ const increaseRewarded = (state, action) => ({
 });
 
 const actionHandlers = {
+  [Types.SET_DATE]: setDate,
   [Types.SET_INI]: setIni,
   [Types.INCREASE_REWARDED]: increaseRewarded
 };

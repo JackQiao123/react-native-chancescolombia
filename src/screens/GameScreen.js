@@ -149,7 +149,7 @@ class GameScreen extends Component {
               <View style={Styles.section}>
                 {CommonWidget.renderHtml(menu.description)}
               </View>
-            ) : null
+            ) : result && result.description && <View style={Styles.section}>{CommonWidget.renderHtml(result.description)}</View>
           }
         </View>
       </ScrollView>

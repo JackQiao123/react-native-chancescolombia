@@ -5,6 +5,7 @@ import { Styles } from '../theme';
 import MenuItem from '../components/custom/MenuItem';
 import CommonWidget from '../components/custom/CommonWidget';
 import ScoreCard from '../components/custom/ScoreCard';
+import TopBar from '../components/custom/TopBar';
 
 class HomeScreen extends Component {
   constructor(props) {
@@ -36,6 +37,7 @@ class HomeScreen extends Component {
         }
       }
     }
+
     return list;
   }
 
@@ -43,11 +45,21 @@ class HomeScreen extends Component {
     return `${index}`;
   }
 
-  async refresh() {
+  async refresh(date) {
     this.setState({
       loading: true
     });
-    await this.props.handleRefresh();
+    await this.props.handleRefresh(date);
+    this.setState({
+      loading: false
+    });
+  }
+
+  async onCalendar(date) {
+    this.setState({
+      loading: true
+    });
+    await this.props.handleRefresh(date);
     this.setState({
       loading: false
     });
@@ -77,6 +89,10 @@ class HomeScreen extends Component {
           <RefreshControl refreshing={loading} onRefresh={this.refresh.bind(this)} />
         }
       >
+        <TopBar
+          onCalendarPress={this.onCalendar.bind(this)}
+          onRefreshPress={this.refresh.bind(this)}
+        />
         <View>
           {
             menuList.length > 0 && (
